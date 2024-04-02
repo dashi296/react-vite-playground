@@ -17,7 +17,7 @@ import dayjs, { Dayjs } from "dayjs";
 // const days = today.daysInMonth(); // 日数
 // const firstDay = today.startOf("month").day(); // 初日
 // const lastDay = today.endOf("month").day(); // 最終日
-// cosnt
+// cosnt weekdayNum = today.day(); // 曜日のnumberを取得(0が日曜日、6が土曜日)
 
 // - カレンダー
 //   - 月選択行
@@ -25,7 +25,7 @@ import dayjs, { Dayjs } from "dayjs";
 //     - 年月表示
 //     - 進む
 //   - 月間カレンダー（７列）
-//     - 曜日行　（１行）
+//     - 曜日行（１行）
 //     - 日付表示部分（最大６行）
 // - 保存ボタン
 
@@ -33,8 +33,22 @@ export const Route = createFileRoute("/calendar")({
   component: CalendarPage,
 });
 
-function CalendarMonthSelecter() {
-  return <div>{"<- Year Month ->"}</div>;
+function CalendarMonthSelecter({
+  date,
+  onClickNext,
+  onClickPrev,
+}: {
+  date: Dayjs;
+  onClickPrev: () => void;
+  onClickNext: () => void;
+}) {
+  return (
+    <div className="flex">
+      <div onClick={onClickPrev}>{"<"}</div>
+      <div>{date.format("YYYY/MM")}</div>
+      <div onClick={onClickNext}>{">"}</div>
+    </div>
+  );
 }
 /**
  * データ構造はこんな感じ?
@@ -72,27 +86,53 @@ function Calendar1Week({ weekDays }: { weekDays: (string | number)[] }) {
 }
 
 function Calendar() {
-  const [showYearMonth, setShowYearMonth] = useState<Dayjs>();
+  const [showYearMonth, setShowYearMonth] = useState<{
+    year: number;
+    month: number;
+  }>({ year: dayjs().year(), month: dayjs().month() - 1 });
 
-  // ここに１週間ずつ入れる？　numberで入れていく
-  const testDayList1 = ["", "", "", "", "", 1, 2];
-  const testDayList2 = [3, 4, 5, 6, 7, 8, 9];
-  const testDayList3 = [10, 11, 12, 13, 14, 15, 16];
-  const testDayList4 = [17, 18, 19, 20, 21, 22, 23];
-  const testDayList5 = [24, 25, 26, 27, 28, 29, 30];
-  const testDayList6 = [31, "", "", "", "", "", ""];
+  const date = dayjs()
+    .year(showYearMonth.year)
+    .month(showYearMonth.month - 1);
+
+  const day = date.date(1).day();
+
+  const daysInMonth = date.daysInMonth();
+
+  const japaneseDay = ["日", "月", "火", "水", "木", "金", "土"][day];
+  // alert(japaneseDay)
+
+  // ここに１週間ずつ入れる？ numberで入れていく
+  const monthArray: (string | number)[] = Array.from(
+    { length: daysInMonth },
+    (_, i) => i + 1
+  );
+
+  for (let i = 0; i < day; i += 1) {
+    monthArray.unshift("");
+  }
+
+  const week = [0, 1, 2, 3, 4, 5, 6];
 
   return (
     <div>
-      <CalendarMonthSelecter />
+      <CalendarMonthSelecter
+        date={date}
+        onClickPrev={() =>
+          setShowYearMonth({ year: 2024, month: showYearMonth.month - 1 })
+        }
+        onClickNext={() =>
+          setShowYearMonth({ year: 2024, month: showYearMonth.month + 1 })
+        }
+      />
+
       {/* 曜日を入れる*/}
       <CalendarHeader />
-      <Calendar1Week weekDays={testDayList1} />
-      <Calendar1Week weekDays={testDayList2} />
-      <Calendar1Week weekDays={testDayList3} />
-      <Calendar1Week weekDays={testDayList4} />
-      <Calendar1Week weekDays={testDayList5} />
-      <Calendar1Week weekDays={testDayList6} />
+      <Calendar1Week weekDays={week.map((v) => monthArray[v])} />
+      <Calendar1Week weekDays={week.map((v) => monthArray[v + 7])} />
+      <Calendar1Week weekDays={week.map((v) => monthArray[v + 14])} />
+      <Calendar1Week weekDays={week.map((v) => monthArray[v + 21])} />
+      <Calendar1Week weekDays={week.map((v) => monthArray[v + 28])} />
     </div>
   );
 }
