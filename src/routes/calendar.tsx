@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, last } from "@tanstack/react-router";
 import { useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
 // 要件
@@ -17,7 +17,7 @@ import dayjs, { Dayjs } from "dayjs";
 // const days = today.daysInMonth(); // 日数
 // const firstDay = today.startOf("month").day(); // 初日
 // const lastDay = today.endOf("month").day(); // 最終日
-// cosnt
+// cosnt weekdayNum = today.day(); // 曜日のnumberを取得(0が日曜日、6が土曜日)
 
 // - カレンダー
 //   - 月選択行
@@ -70,17 +70,41 @@ function Calendar1Week({ weekDays }: { weekDays: (string | number)[] }) {
     </div>
   );
 }
+// まず、DayListの配列を返す関数を作成したい
+function getDayList(yearMonth: Dayjs, line: number) {
+  // const firstDay = today.startOf("month").day(); // 初日
+  // cosnt weekdayNum = today.day(); // 曜日のnumberを取得(0が日曜日、6が土曜日)
+  const weekdayNum = yearMonth.startOf("month").day();
+  const dayList = [...Array(7)].map((_, i) => {
+    const showNum = i - weekdayNum + 1 + 7 * (line - 1);
+
+    if (showNum <= 0) return "";
+    const lastDay = yearMonth.endOf("month").get("date"); // 最終日
+    if (showNum > lastDay) return "";
+    return showNum;
+  });
+  return dayList;
+}
 
 function Calendar() {
-  const [showYearMonth, setShowYearMonth] = useState<Dayjs>();
+  const [showYearMonth, setShowYearMonth] = useState<Dayjs>(
+    dayjs().add(0, "month")
+  );
 
   // ここに１週間ずつ入れる？　numberで入れていく
-  const testDayList1 = ["", "", "", "", "", 1, 2];
-  const testDayList2 = [3, 4, 5, 6, 7, 8, 9];
-  const testDayList3 = [10, 11, 12, 13, 14, 15, 16];
-  const testDayList4 = [17, 18, 19, 20, 21, 22, 23];
-  const testDayList5 = [24, 25, 26, 27, 28, 29, 30];
-  const testDayList6 = [31, "", "", "", "", "", ""];
+  // const testDayList1 = ["", "", "", "", "", 1, 2];
+  const testDayList1 = getDayList(showYearMonth, 1);
+  // const testDayList2 = [3, 4, 5, 6, 7, 8, 9];
+  const testDayList2 = getDayList(showYearMonth, 2);
+  // const testDayList3 = [10, 11, 12, 13, 14, 15, 16];
+  const testDayList3 = getDayList(showYearMonth, 3);
+  // const testDayList4 = [17, 18, 19, 20, 21, 22, 23];
+  const testDayList4 = getDayList(showYearMonth, 4);
+  // const testDayList5 = [24, 25, 26, 27, 28, 29, 30];
+  const testDayList5 = getDayList(showYearMonth, 5);
+  // const testDayList6 = [31, "", "", "", "", "", ""];
+  const testDayList6 = getDayList(showYearMonth, 6);
+  const hasDayList6 = testDayList6[0] !== "";
 
   return (
     <div>
@@ -92,7 +116,7 @@ function Calendar() {
       <Calendar1Week weekDays={testDayList3} />
       <Calendar1Week weekDays={testDayList4} />
       <Calendar1Week weekDays={testDayList5} />
-      <Calendar1Week weekDays={testDayList6} />
+      {hasDayList6 && <Calendar1Week weekDays={testDayList6} />}
     </div>
   );
 }
