@@ -43,15 +43,29 @@ function CalendarMonthSelecter() {
  * {date: '2024/03/12', day: 'Tuesday'}
  * nullだったら空のセルを表示
  */
-function CalendarDay({ day }: { day: Dayjs }) {
-  return <div>{day.format("D")}</div>;
+function CalendarCell({ value }: { value: string | number }) {
+  return <div className="w-5 h-5 border">{value}</div>;
 }
 
-function Calendar1Week({ weekDays }: { weekDays: Dayjs[] }) {
+function CalendarHeader() {
   return (
-    <div>
+    <div className="flex">
+      <CalendarCell value="日" />
+      <CalendarCell value="月" />
+      <CalendarCell value="火" />
+      <CalendarCell value="水" />
+      <CalendarCell value="木" />
+      <CalendarCell value="金" />
+      <CalendarCell value="土" />
+    </div>
+  );
+}
+
+function Calendar1Week({ weekDays }: { weekDays: (string | number)[] }) {
+  return (
+    <div className="flex">
       {weekDays.map((day) => {
-        <CalendarDay day={day} />;
+        return <CalendarCell value={day} />;
       })}
     </div>
   );
@@ -60,12 +74,25 @@ function Calendar1Week({ weekDays }: { weekDays: Dayjs[] }) {
 function Calendar() {
   const [showYearMonth, setShowYearMonth] = useState<Dayjs>();
 
-  const testDayList = [dayjs(), dayjs()];
+  // ここに１週間ずつ入れる？　numberで入れていく
+  const testDayList1 = ["", "", "", "", "", 1, 2];
+  const testDayList2 = [3, 4, 5, 6, 7, 8, 9];
+  const testDayList3 = [10, 11, 12, 13, 14, 15, 16];
+  const testDayList4 = [17, 18, 19, 20, 21, 22, 23];
+  const testDayList5 = [24, 25, 26, 27, 28, 29, 30];
+  const testDayList6 = [31, "", "", "", "", "", ""];
 
   return (
     <div>
       <CalendarMonthSelecter />
-      <Calendar1Week weekDays={testDayList} />
+      {/* 曜日を入れる*/}
+      <CalendarHeader />
+      <Calendar1Week weekDays={testDayList1} />
+      <Calendar1Week weekDays={testDayList2} />
+      <Calendar1Week weekDays={testDayList3} />
+      <Calendar1Week weekDays={testDayList4} />
+      <Calendar1Week weekDays={testDayList5} />
+      <Calendar1Week weekDays={testDayList6} />
     </div>
   );
 }
